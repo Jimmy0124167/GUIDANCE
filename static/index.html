@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Guidance</title>
+  <style>
+    body { font-family: system-ui, Segoe UI, Roboto; background: #0b1220; color: #e6eef6;
+      display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .card { width: 95%; max-width: 900px; background: rgba(255,255,255,0.02); padding: 18px;
+      border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+    .chat { height: 60vh; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .bubble { max-width: 76%; padding: 10px; border-radius: 10px; }
+    .bot { background: rgba(255,255,255,0.03); align-self: flex-start; }
+    .user { background: #183447; align-self: flex-end; }
+    .controls { display: flex; gap: 8px; margin-top: 10px; }
+    input { flex: 1; padding: 10px; border-radius: 999px; border: none; }
+    button { padding: 10px 14px; border-radius: 10px; border: none; background: #06b6d4; color: #042023; font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h2>Guidance — Safe educational chatbot</h2>
+  <div class="chat" id="chat">
+    <div class="bubble bot">Hi — ask something educational (explain, example, practice).</div>
+  </div>
+  <div class="controls">
+    <input id="msg" placeholder="Ask for an explanation, example, or exercise..." />
+    <button id="send">Send</button>
+  </div>
+</div>
+<script>
+async function sendMessage() {
+  const input = document.getElementById('msg');
+  const text = input.value.trim();
+  if (!text) return;
+  const chat = document.getElementById('chat');
+  const u = document.createElement('div'); u.className = 'bubble user'; u.textContent = text; chat.appendChild(u);
+  input.value = '';
+  const placeholder = document.createElement('div'); placeholder.className = 'bubble bot'; placeholder.textContent = '…thinking'; chat.appendChild(placeholder);
+  chat.scrollTop = chat.scrollHeight;
+  try {
+    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text }) });
+    const j = await res.json();
+    placeholder.textContent = j.reply || 'Request blocked by policy.';
+  } catch (e) {
+    placeholder.textContent = 'Could not reach server.';
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+document.getElementById('send').addEventListener('click', sendMessage);
+document.getElementById('msg').addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+</body>
+</html>
