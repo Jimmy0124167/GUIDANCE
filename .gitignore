@@ -1,5 +1,19 @@
-target/
+# Rust build artifacts
+/target
+**/*.rs.bk
+
+# Logs and temp files
 *.log
 *.tmp
-.DS_Store
+*.lock
+
+# Environment files
 .env
+
+# OS-generated stuff
+.DS_Store
+Thumbs.db
+
+# VS Code and Codespaces
+.vscode/
+*.code-workspace
